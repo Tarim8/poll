@@ -1,0 +1,84 @@
+.TH POLL 1 "June 2015" "Tarim" "User Commands"
+.nh
+.ad l
+.SH NAME
+.PP
+\f[B]poll\f[] \- monitor special files, character devices and
+named pipes for changes.
+.SH SYNOPSIS
+.PP
+\f[B]poll\f[] [ [\f[I]OPTIONS\f[]] \f[I]FILE\f[] ]\&...
+.SH DESCRIPTION
+.PP
+\f[B]poll\f[] outputs a special file's contents, when it changes,
+one line at a time.
+It is intended for use with files such as GPIO inputs which appear
+in the /sys file system.
+It will also work with named pipes and character devices but not
+normal files.
+It is often of use with embedded Linux machines such as the
+Raspberry Pi.
+.PP
+\f[B]poll\f[], contrary to what its name suggests, sleeps between
+changes in files.
+It is based on the system library \f[B]poll\f[](2).
+.PP
+Examples:
+.PP
+\f[CR]
+      poll\ --debounce\ 20\ --unique\ "+gpio\ %l\ %t\\n"\ /sys/class/gpio/gpio4/value\ --default\ --delimiter\ \[aq]\\2\\3\\r\\n\[aq]\ "+rfid\ %l\\n"\ /dev/ttyAMA0
+\f[]
+.PP
+Monitor a switch conected to a GPIO pin and an RFID reader
+connected to a serial port.
+Output the switch value and a time (in nanoseconds) when it changes
+state ignoring any bouncing for 20ms after it is switched.
+Output the value read by the RFID reader, delimited by any of
+ctrl-B, ctrl-C, carriage return and newline.
+.SH OPTIONS
+.PP
+Options apply to all subsequent files until they are overridden.
+.SS \f[I]+FORMAT\f[]
+.PP
+Controls output.
+Interpretted sequences are:
+.PP
+\f[CR]
+      %l\ \ Line\ from\ file
+      %p\ \ Filename
+      %t\ \ Time\ since\ Unix\ epoch\ in\ nanoseconds
+      %%\ \ A\ single\ %
+\f[]
+.SS \f[B]--debounce\f[] \f[I]TIME\f[]
+.PP
+After a value change, wait this amount of time (in milliseconds)
+before reporting any further change.
+Useful with \f[B]--unique\f[] as switch bouncing will be
+completely ignored.
+.SS \f[B]--unique\f[]
+.PP
+Only report unique values.
+Useful with \f[B]--debounce\f[].
+.SS \f[B]--duplicates\f[]
+.PP
+Allow all values to be output (opposite of \f[B]--unique\f[]).
+.SS \f[B]--delimiters\f[] \f[I]STRING\f[]
+.PP
+Lines in the file are delimited by one of the characters in
+\f[I]STRING\f[].
+.SS \f[B]--default\f[]
+.PP
+Set options back to default values.
+.SH CAVEATS
+.PP
+Hard coded to have a limit of 64 files and an input line length of
+1024 characters.
+Won't list changes to a \[lq]normal\[rq] file - use
+\f[B]tail -f\f[] instead.
+.SH AUTHOR
+.PP
+Written by Tarim.
+Errors to <poll-cmd@mediaplaygrounds.co.uk>.
+.SH SEE ALSO
+.PP
+\f[B]poll\f[](2), \f[B]tail\f[](1)
