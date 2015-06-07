@@ -1,5 +1,3 @@
-# POLL 1 "June 2015" "Tarim" "User Commands"
-
 NAME
 ====
 
